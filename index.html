@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>English to Gujarati Translator by Yani</title>
+    <title>Translator by Yani</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       body {
@@ -17,118 +17,82 @@
         font-size: 30px;
         font-weight: bold;
         color: #007acc;
-        margin-bottom: 5px;
       }
 
       h1 {
-        color: #333;
         font-size: 22px;
-        margin-top: 5px;
-      }
-
-      .author {
-        font-size: 14px;
-        color: #666;
-        margin-top: -10px;
-        margin-bottom: 20px;
+        color: #333;
       }
 
       textarea {
-        padding: 10px;
-        width: 100%;
+        width: 90%;
         max-width: 500px;
         height: 100px;
+        padding: 10px;
         font-size: 16px;
         border-radius: 8px;
-        border: 1px solid #ccc;
-        margin: 20px 0;
-        resize: none;
+        margin: 15px 0;
       }
 
-      button {
-        padding: 10px 25px;
+      select, button {
+        padding: 10px;
         font-size: 16px;
-        border: none;
+        margin: 10px;
         border-radius: 8px;
-        background-color: #007acc;
-        color: white;
-        cursor: pointer;
       }
 
-      .translation-box {
-        font-size: 18px;
+      .box {
         margin-top: 20px;
         padding: 15px;
+        background: white;
         border-radius: 10px;
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         max-width: 500px;
-        width: 100%;
         margin-left: auto;
         margin-right: auto;
-        word-wrap: break-word;
-      }
-
-      @media (max-width: 600px) {
-        h1 {
-          font-size: 18px;
-        }
-
-        .logo {
-          font-size: 24px;
-        }
-
-        textarea,
-        .translation-box {
-          font-size: 16px;
-        }
-
-        button {
-          font-size: 14px;
-          padding: 8px 20px;
-        }
       }
     </style>
   </head>
+
   <body>
     <div class="logo">🔤 Yani</div>
+    <h1>🌐 Translator (EN ⇄ GU)</h1>
 
-    <h1>🌐 English to Gujarati Translator</h1>
-    <p class="author">Created by Yani Prajapati</p>
+    <!-- Language selector -->
+    <select id="lang">
+      <option value="en|gu">English → Gujarati</option>
+      <option value="gu|en">Gujarati → English</option>
+    </select>
 
-    <p>Type your full sentence or word below:</p>
-    <textarea
-      id="userInput"
-      placeholder="Example: I love Gujarati food."
-    ></textarea>
     <br />
-    <button onclick="translateText()">Translate</button>
 
-    <div class="translation-box" id="output">
+    <textarea id="input" placeholder="Type here..."></textarea>
+    <br />
+
+    <button onclick="translate()">Translate</button>
+
+    <div class="box" id="output">
       Translation will appear here...
     </div>
 
     <script>
-      async function translateText() {
-        const text = document.getElementById("userInput").value.trim();
+      async function translate() {
+        const text = document.getElementById("input").value.trim();
+        const lang = document.getElementById("lang").value;
         const output = document.getElementById("output");
 
         if (text === "") {
-          output.innerText = "Please enter a sentence or word.";
+          output.innerText = "Please enter text";
           return;
         }
 
-        const encodedText = encodeURIComponent(text);
-        const url = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=en|gu`;
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${lang}`;
 
         try {
           const res = await fetch(url);
           const data = await res.json();
-          const translated = data.responseData.translatedText;
-
-          output.innerText = `Gujarati: ${translated}`;
-        } catch (error) {
-          output.innerText = "Translation failed. Please try again later.";
+          output.innerText = data.responseData.translatedText;
+        } catch (e) {
+          output.innerText = "Error in translation";
         }
       }
     </script>
