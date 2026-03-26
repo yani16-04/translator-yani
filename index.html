@@ -1,100 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Translator by Yani</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      body {
-        font-family: "Segoe UI", sans-serif;
-        text-align: center;
-        background-color: #f2f2f2;
-        padding: 40px 20px;
-        margin: 0;
+<head>
+  <meta charset="UTF-8">
+  <title>Translator by Yani</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      padding: 40px 20px;
+      margin: 0;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #007acc;
+    }
+
+    h1 {
+      font-size: 22px;
+      color: #333;
+    }
+
+    textarea {
+      width: 90%;
+      max-width: 500px;
+      height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin: 15px 0;
+    }
+
+    select, button {
+      padding: 10px;
+      font-size: 15px;
+      margin: 8px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    button {
+      background-color: #007acc;
+      color: white;
+      cursor: pointer;
+    }
+
+    .box {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      min-height: 50px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="logo">🔤 Yani</div>
+  <h1>🌐 Translator (EN ⇄ GU)</h1>
+
+  <!-- Language selector -->
+  <select id="lang">
+    <option value="en|gu">English → Gujarati</option>
+    <option value="gu|en">Gujarati → English</option>
+  </select>
+
+  <button onclick="swapLang()">🔄 Swap</button>
+
+  <br>
+
+  <textarea id="input" placeholder="Type text here..."></textarea>
+
+  <br>
+
+  <button onclick="translateText()">Translate</button>
+
+  <div class="box" id="output">
+    Translation will appear here...
+  </div>
+
+  <script>
+    function swapLang() {
+      const lang = document.getElementById("lang");
+      if (lang.value === "en|gu") {
+        lang.value = "gu|en";
+      } else {
+        lang.value = "en|gu";
+      }
+    }
+
+    async function translateText() {
+      const text = document.getElementById("input").value.trim();
+      const lang = document.getElementById("lang").value;
+      const output = document.getElementById("output");
+
+      if (text === "") {
+        output.innerText = "Please enter text";
+        return;
       }
 
-      .logo {
-        font-size: 30px;
-        font-weight: bold;
-        color: #007acc;
-      }
+      output.innerText = "Translating... ⏳";
 
-      h1 {
-        font-size: 22px;
-        color: #333;
-      }
+      try {
+        const response = await fetch(
+          "https://api.mymemory.translated.net/get?q=" +
+          encodeURIComponent(text) +
+          "&langpair=" + lang
+        );
 
-      textarea {
-        width: 90%;
-        max-width: 500px;
-        height: 100px;
-        padding: 10px;
-        font-size: 16px;
-        border-radius: 8px;
-        margin: 15px 0;
-      }
+        const data = await response.json();
 
-      select, button {
-        padding: 10px;
-        font-size: 16px;
-        margin: 10px;
-        border-radius: 8px;
-      }
-
-      .box {
-        margin-top: 20px;
-        padding: 15px;
-        background: white;
-        border-radius: 10px;
-        max-width: 500px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="logo">🔤 Yani</div>
-    <h1>🌐 Translator (EN ⇄ GU)</h1>
-
-    <!-- Language selector -->
-    <select id="lang">
-      <option value="en|gu">English → Gujarati</option>
-      <option value="gu|en">Gujarati → English</option>
-    </select>
-
-    <br />
-
-    <textarea id="input" placeholder="Type here..."></textarea>
-    <br />
-
-    <button onclick="translate()">Translate</button>
-
-    <div class="box" id="output">
-      Translation will appear here...
-    </div>
-
-    <script>
-      async function translate() {
-        const text = document.getElementById("input").value.trim();
-        const lang = document.getElementById("lang").value;
-        const output = document.getElementById("output");
-
-        if (text === "") {
-          output.innerText = "Please enter text";
-          return;
-        }
-
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${lang}`;
-
-        try {
-          const res = await fetch(url);
-          const data = await res.json();
+        if (data && data.responseData) {
           output.innerText = data.responseData.translatedText;
-        } catch (e) {
-          output.innerText = "Error in translation";
+        } else {
+          output.innerText = "Translation not available 😕";
         }
+
+      } catch (error) {
+        output.innerText = "Error: API not working 🚫";
+        console.log(error);
       }
-    </script>
-  </body>
+    }
+  </script>
+
+</body>
 </html>
